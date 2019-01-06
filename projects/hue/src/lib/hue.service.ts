@@ -3,6 +3,7 @@ import { Http } from '@angular/http';
 import { isNullOrUndefined } from 'util';
 import { Bridge } from './models/bridge';
 import { LocalService } from './services/local.service';
+import { Light } from './models/light';
 @Injectable({
   providedIn: 'root'
 })
@@ -48,44 +49,57 @@ export class HueService {
     if (!isNullOrUndefined(res)) {
       const jsonRes = res.json() || [];
       const resObject = jsonRes[0] || {};
-      if (!isNullOrUndefined(resObject.success.username)) {
+      if (!isNullOrUndefined(resObject.success)) {
         this.localService.setUsername(resObject.success.username);
-        return resObject.success.username;
+        return {error: null, username: resObject.success.username, errorMessage: ''};
+      } else if (!isNullOrUndefined(resObject.error)) {
+        return {error: resObject.error, errorMessage: 'Press bridge button to connect'};
       }
     }
-    return '';
+    return res;
   }
 
   async getLights() {
-    if (this.isConnected) {
-      const res = await this.http.get(this.localService.endPoint);
-      return res;
+    const res = await this.http.get(`${this.localService.endPoint}/lights`).toPromise();
+    if (!isNullOrUndefined(res.json())) {
+      const arrData = Object.entries(res.json()).map(([id, value]) => (this.parseLight(id, value)));
+      return arrData;
     }
-    return this.handlerError();
+    return [];
   }
-
+  private parseLight(id: any, value: any) {
+    const light: Light = {
+      ...value,
+      id: id
+    };
+    return light;
+  }
   get isConnected(): boolean {
     return this.localService.username !== '' ? true : false;
   }
 
   async light(value: boolean, id: string) {
     if (this.isConnected) {
-      const url = `${this.localService.endPoint}lights/${id}/state`;
-      const res = this.http.put(url, {on: value});
-      return res;
+      const url = `${this.localService.endPoint}/lights/${id}/state`;
+      const res = await this.http.put(url, {on: value}).toPromise();
+      return res.json();
     }
     return this.handlerError();
   }
 
   async getLight(id: string) {
     if (this.isConnected) {
-      const url = `${this.localService.endPoint}lights/${id}/state`;
-      const res = this.http.get(url);
-      return res;
+      const url = `${this.localService.endPoint}/lights/${id}/state`;
+      const res = await this.http.get(url).toPromise();
+      return res.json();
     }
     return this.handlerError();
   }
-
+  setAPIKey(value: string) {
+    if (!isNullOrUndefined(value)) {
+      this.localService.setUsername(value);
+    }
+  }
   private handlerError() {
     return {
       error: 'Missing username',

@@ -19,7 +19,7 @@ export class LocalService {
   }
   get host() {
     // TODO make it generic
-    return (this.bridges.length > 0 ? this.bridges[0].address : '') || '';
+    return (this.bridges.length > 0 ? `${this.bridges[0].address}/api` : '') || '';
   }
   get username() {
     return localStorage.getItem('username') || '';

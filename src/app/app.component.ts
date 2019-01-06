@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HueService } from 'hue';
+import { Light } from 'hue/lib/models/light';
+import { EventEmitter } from 'events';
 
 @Component({
   selector: 'hd-root',
@@ -8,6 +10,7 @@ import { HueService } from 'hue';
 })
 export class AppComponent implements OnInit {
   title = 'hue-demo';
+  public lights: Array<Light>;
   constructor(
     private hueService: HueService
   ) {}
@@ -36,9 +39,18 @@ export class AppComponent implements OnInit {
 
   private getLights() {
     this.hueService.getLights().then((lights) => {
+      this.lights = lights;
       console.log('lights ', lights);
     }).catch((err) => {
       console.log('error lights', err);
+    });
+  }
+
+  onOff(value: Light) {
+    this.hueService.light(!value.state.on, value.id).then((res) => {
+      value.state.on = !value.state.on;
+    }).catch((err) => {
+      console.log('error ', err);
     });
   }
 }

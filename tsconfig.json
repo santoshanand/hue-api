@@ -16,6 +16,14 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+      "hue": [
+        "dist/hue"
+      ],
+      "hue/*": [
+        "dist/hue/*"
+      ]
+    }
   }
 }

@@ -133,6 +133,41 @@
           }
         }
       }
+    },
+    "hue": {
+      "root": "projects/hue",
+      "sourceRoot": "projects/hue/src",
+      "projectType": "library",
+      "prefix": "hue",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/hue/tsconfig.lib.json",
+            "project": "projects/hue/ng-package.json"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/hue/src/test.ts",
+            "tsConfig": "projects/hue/tsconfig.spec.json",
+            "karmaConfig": "projects/hue/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/hue/tsconfig.lib.json",
+              "projects/hue/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
     }
   },
   "defaultProject": "hue-demo"
